@@ -1,32 +1,75 @@
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #f4f1ec;
-  color: #222;
+.highlightLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-header {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 16px 24px;
-  border-bottom: 1px solid #ddd;
+.highlight {
+  position: absolute;
+  background: rgba(255, 213, 0, 0.4);
+  mix-blend-mode: multiply;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.highlight.has-note {
+  border-bottom: 2px solid #e0a800;
+}
+
+.note-popup {
+  position: absolute;
+  z-index: 10;
+  width: 280px;
+  padding: 12px;
   background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
 }
 
-h1 {
-  font-size: 18px;
-  margin: 0;
+.note-popup.hidden {
+  display: none;
 }
 
-main {
+.note-popup textarea {
+  width: 100%;
+  min-height: 80px;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.note-actions {
   display: flex;
-  justify-content: center;
-  padding: 32px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.page {
-  position: relative;
+.note-actions .spacer {
+  flex: 1;
+}
+
+.note-actions button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   background: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.note-actions .btn-save {
+  background: #222;
+  border-color: #222;
+  color: #fff;
+}
+
+.note-actions .btn-delete {
+  color: #b00020;
+  border-color: transparent;
 }
