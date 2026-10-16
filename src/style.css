@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f4f1ec;
+  color: #222;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.page {
+  position: relative;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
