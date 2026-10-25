@@ -188,7 +188,7 @@ function setup(root) {
 
   // Replay: clear everything
   new MutationObserver(() => {
-    if (!isFinal()) {
+    if (!isFinal() && (!note.hidden || root.classList.contains('has-note'))) {
       closeNote();
       root.classList.remove('has-note');
     }
