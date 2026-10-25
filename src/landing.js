@@ -162,7 +162,7 @@ function createLanding() {
   let s = 1;
   let step = 1; // 1-4 are the steps, 5 is the finale
   let hl = null; // [start, end] character offsets in LONG_TEXT
-  let color = 'blue';
+  let color = 'green';
   let hintTimer = null;
   let hintToken = 0;
 

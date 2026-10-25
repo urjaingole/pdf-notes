@@ -1005,3 +1005,51 @@ html:has(.lp) .frame {
     outline-offset: calc(7 * var(--p));
   }
 }
+/* ---------- Round 4: milder Save cue, green by default ---------- */
+
+/* Start colors (green = #B9FFB1) */
+.lp {
+  --note: #b9ffb1;
+  --stroke: #6fd960;
+  --hl: #a8ee9f;
+  --hl-stroke: #6fd960;
+}
+
+/* Save: a soft, very light black ring, like the glow around the highlight at step 3 */
+.lp-save.lp-cue {
+  outline: none;
+  animation: lp-cue-ring 1.4s ease-out infinite;
+}
+
+@keyframes lp-cue-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 0 calc(10 * var(--p)) rgba(0, 0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-save.lp-cue {
+    box-shadow: 0 0 0 calc(5 * var(--p)) rgba(0, 0, 0, 0.18);
+  }
+}
+
+/* The glow around the highlight, the selection and the hint sweep use the highlight's own color */
+@keyframes lp-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--hl-stroke) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 calc(10 * var(--p)) color-mix(in srgb, var(--hl-stroke) 0%, transparent);
+  }
+}
+
+.lp-c1 ::selection {
+  background: color-mix(in srgb, var(--hl-stroke) 25%, transparent);
+}
+
+.lp-sweep {
+  background: color-mix(in srgb, var(--hl-stroke) 22%, transparent);
+}

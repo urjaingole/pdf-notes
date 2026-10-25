@@ -89,7 +89,7 @@ function setup(root) {
       ta.value = NOTE.slice(0, i);
       ta.scrollTop = ta.scrollHeight;
       const ch = NOTE[i - 1];
-      await sleep(/[.,:;]/.test(ch) ? 170 : ch === ' ' ? 30 : 28 + Math.random() * 32);
+      await sleep(/[.,:;]/.test(ch) ? 70 : ch === ' ' ? 12 : 12 + Math.random() * 14);
     }
     typing = false;
     if (t !== token || !inStep2()) return;
