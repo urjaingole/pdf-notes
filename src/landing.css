@@ -1053,3 +1053,72 @@ html:has(.lp) .frame {
 .lp-sweep {
   background: color-mix(in srgb, var(--hl-stroke) 22%, transparent);
 }
+/* ---------- Finale: click a highlight to read its note ---------- */
+
+.lp.is-final .lp-c1 .lp-hl {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.lp.is-final .lp-c1 .lp-hl:hover,
+.lp-hl.is-picked {
+  box-shadow: 0 0 0 calc(4 * var(--p)) color-mix(in srgb, var(--hl-stroke) 45%, transparent);
+}
+
+/* The note: opens over the left edge of the card (its position is set by landing-notes.js) */
+.lp-n5 {
+  --z: 60;
+  --strip-h: 0px;
+  height: calc(400 * var(--p)); /* use 443 for a perfect square */
+  pointer-events: auto;
+  animation: none;
+}
+
+.lp-n5 .lp-bin,
+.lp-n5 .lp-edit {
+  pointer-events: none;
+}
+
+.lp-right {
+  display: flex;
+  align-items: center;
+  gap: calc(20 * var(--p));
+}
+
+.lp-copy {
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--p));
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: calc(16 * var(--p));
+  cursor: pointer;
+}
+
+.lp-n5 a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* The hint, until the first click */
+.lp-tip {
+  display: none;
+  position: absolute;
+  left: calc(40 * var(--hu));
+  top: calc(610 * var(--p));
+  width: calc(300 * var(--p));
+  margin: 0;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: max(11px, calc(16 * var(--hu)));
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.lp.is-final:not(.has-note) .lp-tip {
+  display: block;
+}

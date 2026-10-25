@@ -229,7 +229,7 @@ function createLanding() {
     l1.innerHTML = '';
     if (step === 5) {
       finalMarks().forEach((m, i) => {
-        rectsFor(t1, m.a, m.b).forEach((r) => placeRect(l1, r, m.c, i * 140));
+        rectsFor(t1, m.a, m.b).forEach((r) => { placeRect(l1, r, m.c, i * 140); const el = l1.lastElementChild; el.dataset.a = m.a; el.dataset.b = m.b; el.dataset.cid = m.c.id; el.dataset.i = i; });
       });
     } else if (hl) {
       rectsFor(t1, hl[0], hl[1]).forEach((r) => placeRect(l1, r, null, 0));

@@ -10,4 +10,5 @@ window.__LANDING__ = !isExtension;
 if (!isExtension) {
   import('./landing.js');
   import('./landing-typing.js');
+  import('./landing-notes.js');
 }
