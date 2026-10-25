@@ -1,0 +1,203 @@
+/* ---------- Preview window on the library page ---------- */
+
+:root {
+  --pv-bar-h: 30px; /* 8 + 12 (10px text at 120%) + 8 + 2px border */
+  --pv-blur: 4.51px; /* smudge strength: smaller = crisper, bigger = smudgier */
+}
+
+/* The label on each card */
+html.lib-new .paper-card {
+  position: relative;
+}
+
+.pv-btn {
+  position: absolute;
+  right: calc(40px * var(--u, 1));
+  top: 52.7%;
+  z-index: 2;
+  transform: translateY(-50%);
+  padding: 8px 0 8px 14px;
+  border: 0;
+  background: none;
+  color: #000;
+  font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.36px;
+  line-height: 120%;
+  text-align: right;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.paper-card:hover .pv-btn,
+.pv-btn:focus-visible,
+.pv-btn.is-on {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .pv-btn {
+    opacity: 1;
+  }
+}
+
+/* Position: over columns 3 and 4, or over columns 1 and 2 (also used by the two layers) */
+.pv--right {
+  left: calc(884px * var(--u, 1));
+}
+
+.pv--left {
+  left: calc(40px * var(--u, 1));
+}
+
+html:not(.lib-new) .pv,
+html:not(.lib-new) .pv-layer {
+  display: none;
+}
+
+/* ---------- Two layers under the stripe: blur first, then the green Color blend ---------- */
+
+.pv-layer {
+  position: fixed;
+  top: calc(194px * var(--u, 1));
+  width: calc(828px * var(--u, 1));
+  height: var(--pv-bar-h);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0s linear 0.15s;
+}
+
+.pv-layer.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.15s ease;
+}
+
+/* 1. blurs the page behind the stripe */
+.pv-blur {
+  z-index: 24;
+  background: transparent;
+  -webkit-backdrop-filter: blur(calc(var(--pv-blur, 4.51px) * var(--u, 1)));
+  backdrop-filter: blur(calc(var(--pv-blur, 4.51px) * var(--u, 1)));
+}
+
+/* 2. colours the blurred result green (Color blend, like Figma) */
+.pv-tint {
+  z-index: 25;
+  background: #b9ffb1;
+  mix-blend-mode: color;
+}
+
+/* ---------- The window: bottom touches the bottom of the screen ---------- */
+
+.pv {
+  position: fixed;
+  top: calc(194px * var(--u, 1));
+  bottom: 0;
+  z-index: 27;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: calc(828px * var(--u, 1));
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0s linear 0.15s;
+}
+
+.pv.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.15s ease;
+}
+
+/* Top stripe: 8px top and bottom, 10px text. The green and blur come from the layers underneath. */
+.pv-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  box-sizing: border-box;
+  height: var(--pv-bar-h);
+  padding: 8px 16px;
+  border: 1px solid #fff;
+  background: transparent;
+}
+
+.pv-bar button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 120%;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.pv-open {
+  color: #f54b4b;
+}
+
+.pv-close {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* Frame below */
+.pv-frame {
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+  border: 1.806px solid rgba(187, 191, 194, 0.13);
+  background: rgba(246, 249, 250, 0.4);
+  -webkit-backdrop-filter: blur(calc(var(--pv-blur, 4.51px) * var(--u, 1)));
+  backdrop-filter: blur(calc(var(--pv-blur, 4.51px) * var(--u, 1)));
+}
+
+.pv-scroll {
+  box-sizing: border-box;
+  height: 100%;
+  padding: calc(72.235px * var(--u, 1));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+
+/* Pages */
+.pv-page {
+  position: relative;
+  width: 100%;
+  margin: 0 0 calc(24px * var(--u, 1));
+  background: #fff;
+  box-shadow: 0 0 20px rgba(154, 159, 161, 0.2);
+}
+
+.pv-page canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pv-hl {
+  position: absolute;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.pv-status {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.55);
+  font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  text-transform: uppercase;
+}

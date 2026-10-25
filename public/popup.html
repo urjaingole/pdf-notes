@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notes Embedder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        width: 320px;
+        margin: 0;
+        padding: 16px;
+        background: #f0f3f6;
+        color: rgba(0, 0, 0, 0.8);
+        font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+      .title {
+        margin: 0 0 12px;
+        font-weight: 700;
+      }
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #fff;
+        background: #f6f9fa;
+        color: inherit;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.2;
+        text-align: left;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn + .btn {
+        margin-top: 4px;
+      }
+      .btn:hover:not(:disabled) {
+        background: #e9f0f3;
+      }
+      .btn.primary {
+        border-color: #1b1b1c;
+        background: #1b1b1c;
+        color: #fff;
+      }
+      .btn.primary:hover:not(:disabled) {
+        background: #000;
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .hint {
+        margin: 12px 0 0;
+        color: #5b6670;
+        text-transform: none;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="title">Notes Embedder</p>
+    <button id="open" class="btn primary" type="button">Open this PDF in the reader</button>
+    <button id="library" class="btn" type="button">My papers</button>
+    <p id="hint" class="hint"></p>
+    <script src="popup.js"></script>
+  </body>
+</html>

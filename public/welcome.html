@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to Notes Embedder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 40px;
+        background: #f0f3f6;
+        color: rgba(0, 0, 0, 0.8);
+        font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      main {
+        max-width: 640px;
+      }
+      .eyebrow {
+        margin: 0 0 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0 0 32px;
+        color: #1b1b1c;
+        font-size: 44px;
+        font-weight: 300;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+      }
+      ol {
+        margin: 0 0 32px;
+        padding-left: 24px;
+      }
+      li {
+        margin-bottom: 14px;
+      }
+      .row {
+        display: flex;
+        gap: 4px;
+      }
+      button {
+        padding: 15px;
+        border: 1px solid #fff;
+        background: #f6f9fa;
+        color: inherit;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.2;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #e9f0f3;
+      }
+      .small {
+        margin-top: 24px;
+        color: #5b6670;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Notes Embedder</p>
+      <h1>You're all set</h1>
+      <ol>
+        <li>
+          <b>Pin the icon.</b> Click the puzzle piece at the top right of the browser, then the pin
+          next to Notes Embedder.
+        </li>
+        <li><b>Open any PDF</b> in a tab, like a paper on arXiv or a journal site.</li>
+        <li><b>Click the icon</b>, then "Open this PDF in the reader".</li>
+        <li><b>Select text</b> to highlight it, then add a note.</li>
+      </ol>
+      <div class="row">
+        <button id="open-library" type="button">Open my library</button>
+        <button id="open-settings" type="button">Extension settings</button>
+      </div>
+      <p class="small">
+        PDFs saved on your computer: open the extension settings and turn on "Allow access to file
+        URLs".
+      </p>
+    </main>
+    <script src="welcome.js"></script>
+  </body>
+</html>

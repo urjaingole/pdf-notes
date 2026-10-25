@@ -1,0 +1,880 @@
+/* The old static demo that main.js still inserts stays hidden */
+.demo {
+  display: none !important;
+}
+
+/* ---------- ADD button: blue (red is kept for delete and errors) ---------- */
+
+html .add-btn {
+  background: #26b4fe;
+}
+
+/* ---------- Big title: dev specs ---------- */
+
+html .lib-title {
+  color: #1b1b1c;
+  -webkit-text-stroke: 1px #000;
+  mix-blend-mode: multiply;
+}
+
+html .title-block {
+  box-sizing: border-box;
+  background: #1b1b1c;
+  border: 1px solid #000;
+}
+
+/* ---------- Empty home page: matches the reference at 1080px tall,
+   and shrinks in shorter windows so nothing needs scrolling ---------- */
+
+html:has(.dm) {
+  overflow-y: auto;
+}
+
+html:has(.dm) .band {
+  height: clamp(
+    calc(90px * var(--u)),
+    calc(100vh - 842px * var(--u)),
+    calc(238px * var(--u))
+  );
+}
+
+html:has(.dm) .lib-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: clamp(
+    calc(73px * var(--u)),
+    calc(100vh - 952px * var(--u)),
+    calc(128px * var(--u))
+  );
+  padding: 0 24px;
+}
+
+html:has(.dm) .lib-list {
+  row-gap: 0;
+  padding-bottom: 0;
+}
+
+/* ---------- Demo: built in 1920px design pixels, scaled by --s ----------
+   The stage starts at the line under the "No papers yet" box. */
+
+.dm {
+  --p: calc(1px * var(--s, 1)); /* one design pixel */
+  --note: #b2e0ff;
+  --stroke: #26b4fe;
+  --hl: #a1d2f3;
+  --hl-stroke: #26b4fe;
+  --ph-init: 237;
+  --ph-run: 356;
+  --ph-fin: 392;
+  --l-init: 9;
+  --l-run: 13;
+  --l-fin: 12;
+  grid-column: 1 / -1;
+  position: relative;
+  width: 100%;
+  font-family: 'Lekton', ui-monospace, Menlo, Consolas, monospace;
+  color: rgba(0, 0, 0, 0.8);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dm-stage {
+  position: relative;
+  width: calc(1674 * var(--p));
+  height: calc(var(--sh, 520) * var(--p));
+  margin: 0 auto;
+}
+
+/* Stacking: the layers of every card and note share one stacking context
+   (the page), so the blend modes can see what is behind them.
+   Do not add opacity, transform or filter to cards or notes. */
+
+.dm-card,
+.dm-note {
+  position: absolute;
+  width: calc(443 * var(--p));
+  pointer-events: none;
+  animation: dm-rise 0.6s ease backwards;
+}
+
+/* Card 1: starts centered and low, touching the bottom of the window;
+   then moves to 72px from the top and left. At the end it grows wide. */
+.dm-c1 {
+  --z: 10;
+  --strip-bg: #ebfef7;
+  --strip-border: #30dfc5;
+  --ph: var(--ph-init);
+  --lines: var(--l-init);
+  left: calc(72 * var(--p));
+  top: calc(72 * var(--p));
+  transition:
+    left 0.7s cubic-bezier(0.3, 0.7, 0.2, 1),
+    top 0.7s cubic-bezier(0.3, 0.7, 0.2, 1),
+    width 0.8s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.dm:not(.is-started) .dm-c1 {
+  left: calc(615.5 * var(--p));
+  top: calc(157 * var(--p));
+}
+
+.dm.is-started .dm-c1 {
+  --ph: var(--ph-run);
+  --lines: var(--l-run);
+}
+
+.dm.is-final .dm-c1 {
+  --ph: var(--ph-fin);
+  --lines: var(--l-fin);
+  width: calc(900 * var(--p));
+}
+
+/* Notes 2 and 4 share the same top line; card 3 steps down */
+.dm-n2 {
+  --z: 20;
+  left: calc(421 * var(--p));
+  top: calc(162 * var(--p));
+}
+
+.dm-c3 {
+  --z: 30;
+  --strip-bg: #ffeaeb;
+  --strip-border: #ff8e8e;
+  left: calc(781 * var(--p));
+  top: calc(269 * var(--p));
+}
+
+.dm-n4 {
+  --z: 40;
+  left: calc(1114 * var(--p));
+  top: calc(162 * var(--p));
+}
+
+.dm.step-1 .dm-c1,
+.dm.step-2 .dm-n2,
+.dm.step-3 .dm-c3,
+.dm.step-4 .dm-n4,
+.dm.is-done .dm-n4 {
+  pointer-events: auto;
+}
+
+@keyframes dm-rise {
+  from {
+    margin-top: calc(16 * var(--p));
+  }
+}
+
+.dm-card.is-pop,
+.dm-note.is-pop {
+  animation: dm-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.dm-note.dm-shake {
+  animation: dm-shake 0.35s ease;
+}
+
+@keyframes dm-shake {
+  25% {
+    margin-left: calc(-7 * var(--p));
+  }
+  75% {
+    margin-left: calc(7 * var(--p));
+  }
+}
+
+/* ---------- "TRY DEMO" help: pill stays still, only the triangle moves ---------- */
+
+.dm-help {
+  position: absolute;
+  left: calc(1058.5 * var(--p));
+  top: calc(340 * var(--p));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.dm.is-started .dm-help {
+  opacity: 0;
+}
+
+.dm-ptr {
+  position: relative;
+  flex: none;
+  width: calc(106 * var(--p));
+  height: calc(14 * var(--p));
+}
+
+.dm-tri {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(12 * var(--p));
+  height: 100%;
+  background: #111;
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  animation: dm-tri 1.6s ease-in-out infinite;
+}
+
+/* The line is pinned to the pill and stretches with the triangle, so it never detaches */
+.dm-line {
+  position: absolute;
+  left: calc(11 * var(--p));
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #111;
+  transform-origin: right center;
+  animation: dm-line 1.6s ease-in-out infinite;
+}
+
+@keyframes dm-tri {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(10 * var(--p)));
+  }
+}
+
+@keyframes dm-line {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.895);
+  }
+}
+
+.dm-pill {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc(10 * var(--p));
+  padding: calc(10 * var(--p));
+  border-radius: calc(8 * var(--p));
+  border: 1px solid #b9b9b9;
+  background: #f6f9fa;
+  box-shadow: calc(4 * var(--p)) calc(4 * var(--p)) calc(50 * var(--p)) 0
+    rgba(154, 159, 161, 0.16);
+  color: #111;
+  font-size: calc(17 * var(--p));
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Dimmed steps: a pale veil, never opacity */
+.dm-veil {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 5);
+  background: rgba(238, 241, 244, 0.62);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.is-off > .dm-veil {
+  opacity: 1;
+}
+
+.dm-tab {
+  transition: opacity 0.35s ease;
+}
+
+.dm-note.is-off .dm-tab {
+  opacity: 0.5;
+}
+
+/* ---------- Paper cards ---------- */
+
+.dm-strip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(24 * var(--p));
+  box-sizing: border-box;
+  height: calc(36 * var(--p));
+  padding: 0 calc(16 * var(--p));
+  font-size: calc(16 * var(--p));
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* "color" blend: tints what is behind the strip, never the text */
+.dm-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 1);
+  background: var(--strip-bg);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+
+.dm-strip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 3);
+  border: 1px solid var(--strip-border);
+  pointer-events: none;
+}
+
+.dm-strip > * {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+}
+
+.dm-strip b {
+  font-size: calc(18 * var(--p));
+  font-weight: 700;
+}
+
+.dm-paper {
+  position: relative;
+  z-index: calc(var(--z) + 1);
+  box-sizing: border-box;
+  height: calc(356 * var(--p));
+  padding: calc(40 * var(--p));
+  overflow: hidden;
+  background: #f6f9fa;
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+}
+
+.dm-c1 .dm-paper {
+  height: calc(var(--ph) * var(--p));
+  transition: height 0.8s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+/* Card 3 is shorter: five whole lines */
+.dm-c3 .dm-paper {
+  height: calc(172 * var(--p));
+}
+
+/* The text box only shows whole lines, so no line is ever cut in half */
+.dm-tbox {
+  overflow: hidden;
+  height: calc(var(--lines, 5) * 21.6 * var(--p));
+  height: calc(var(--lines, 5) * 1lh);
+}
+
+.dm-c1 .dm-tbox {
+  transition: height 0.8s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.dm-c3 {
+  --lines: 5;
+}
+
+.dm-text {
+  position: relative;
+  margin: 0;
+}
+
+.dm-c1 .dm-text {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+.dm-c1 ::selection {
+  background: rgba(38, 180, 254, 0.25);
+}
+
+/* The soft rectangle that merges the bottom of each card */
+.dm-paper::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(110 * var(--p));
+  background: linear-gradient(181deg, rgba(246, 249, 250, 0) 11.67%, #f6f9fa 98.82%);
+  filter: blur(calc(5 * var(--p)));
+  pointer-events: none;
+}
+
+.dm-c3 .dm-paper::after {
+  height: calc(70 * var(--p));
+}
+
+.dm.is-final .dm-c1 .dm-paper::after {
+  height: calc(40 * var(--p));
+}
+
+.dm-hls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Color legend at the bottom of the final card */
+.dm-legend {
+  display: none;
+  position: absolute;
+  z-index: 2;
+  left: calc(40 * var(--p));
+  bottom: calc(24 * var(--p));
+  gap: calc(24 * var(--p));
+  font-size: calc(14 * var(--p));
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dm.is-final .dm-legend {
+  display: flex;
+}
+
+.dm-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8 * var(--p));
+}
+
+.dm-legend i {
+  display: block;
+  width: calc(16 * var(--p));
+  height: calc(16 * var(--p));
+}
+
+/* Highlight: 1px stroke, fill with the "color" blend on its own layer.
+   It grows from left to right like a marker. */
+.dm-hl {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid var(--hl-stroke);
+  animation: dm-grow 0.4s ease-out backwards;
+  transition: border-color 0.3s ease;
+}
+
+.dm-hl::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--hl);
+  mix-blend-mode: color;
+  transition: background 0.3s ease;
+}
+
+@keyframes dm-grow {
+  from {
+    width: 0;
+  }
+}
+
+.dm.step-3 .dm-c3 .dm-hl {
+  pointer-events: auto;
+  cursor: pointer;
+  animation:
+    dm-grow 0.4s ease-out backwards,
+    dm-ring 1.4s ease-out 0.4s infinite;
+}
+
+.dm-hl.dm-ping {
+  animation: dm-ring 0.9s ease-out 2;
+}
+
+@keyframes dm-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(38, 180, 254, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 calc(10 * var(--p)) rgba(38, 180, 254, 0);
+  }
+}
+
+/* ---------- Frosted notes ---------- */
+
+.dm-note {
+  --strip-h: calc(36 * var(--p));
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+}
+
+/* glass: blurs what is behind the note */
+.dm-note::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--z);
+  -webkit-backdrop-filter: blur(calc(4 * var(--p)));
+  backdrop-filter: blur(calc(4 * var(--p)));
+  pointer-events: none;
+}
+
+/* body tint */
+.dm-note::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: var(--strip-h);
+  z-index: calc(var(--z) + 1);
+  background: var(--note);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.dm-nstrip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--p));
+  box-sizing: border-box;
+  height: var(--strip-h);
+  padding: 0 calc(16 * var(--p));
+}
+
+.dm-nstrip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 1);
+  background: var(--stroke);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+
+.dm-nstrip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 3);
+  border: 1px solid var(--stroke);
+  pointer-events: none;
+}
+
+.dm-nstrip > * {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+}
+
+.dm-sq {
+  width: calc(20 * var(--p));
+  height: calc(20 * var(--p));
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--c);
+  cursor: pointer;
+}
+
+.dm-sq.is-current {
+  box-shadow: inset 0 0 0 1px var(--sc);
+}
+
+.dm-sq.none {
+  background: #fff
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 0.7px),
+      #111 calc(50% - 0.7px),
+      #111 calc(50% + 0.7px),
+      transparent calc(50% + 0.7px)
+    );
+  box-shadow: inset 0 0 0 1px #111;
+}
+
+.dm-nbody {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+  padding: calc(34 * var(--p)) calc(40 * var(--p)) 0;
+}
+
+.dm-ta {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(52 * var(--p));
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+  overflow: hidden;
+  resize: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.dm-ta::placeholder {
+  color: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.dm-ta:disabled {
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+.dm-ta.dm-nudge {
+  outline: 1px dashed var(--stroke);
+  outline-offset: calc(8 * var(--p));
+}
+
+.dm-ntext {
+  min-height: calc(52 * var(--p));
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.dm-nfoot {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(24 * var(--p)) calc(40 * var(--p)) calc(30 * var(--p));
+}
+
+.dm-actions {
+  display: flex;
+  gap: calc(8 * var(--p));
+}
+
+.dm-save,
+.dm-cancel {
+  height: calc(30 * var(--p));
+  padding: 0 calc(16 * var(--p));
+  border-radius: 0;
+  font-family: inherit;
+  font-size: calc(14 * var(--p));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.dm-save {
+  border: 0;
+  background: #111;
+  color: #fff;
+}
+
+.dm-cancel {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  background: transparent;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.dm-bin {
+  display: grid;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dm-edit {
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--p));
+  font-size: calc(16 * var(--p));
+}
+
+/* The numbered tab above each note */
+.dm-tab {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  z-index: calc(var(--z) + 3);
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--p));
+  box-sizing: border-box;
+  height: calc(28 * var(--p));
+  padding: 0 calc(12 * var(--p));
+  background: #fff;
+  border: 1px solid var(--stroke);
+  border-bottom: 0;
+  font-size: calc(14 * var(--p));
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dm-tab b {
+  font-weight: 700;
+}
+
+/* ---------- Finale: tagline above the card, Replay on the right ---------- */
+
+.dm-tagline {
+  position: absolute;
+  left: calc(72 * var(--p));
+  top: calc(16 * var(--p));
+  z-index: 60;
+  margin: 0;
+  font-size: calc(30 * var(--p));
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: dm-rise 0.5s ease backwards;
+}
+
+.dm-tagline[hidden] {
+  display: none;
+}
+
+.dm-done {
+  position: absolute;
+  left: calc(529 * var(--p));
+  top: calc(14 * var(--p));
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(12 * var(--p));
+  box-sizing: border-box;
+  width: calc(443 * var(--p));
+  padding: calc(8 * var(--p)) calc(12 * var(--p)) calc(8 * var(--p)) calc(16 * var(--p));
+  background: #fff;
+  border: 1px solid #a2eae1;
+  font-size: calc(14 * var(--p));
+  text-transform: uppercase;
+  pointer-events: auto;
+  animation: dm-rise 0.5s ease 0.3s backwards;
+}
+
+.dm-done[hidden] {
+  display: none;
+}
+
+.dm-replay {
+  padding: calc(6 * var(--p)) calc(12 * var(--p));
+  border: 1px solid #111;
+  border-radius: 0;
+  background: #111;
+  color: #fff;
+  font-family: inherit;
+  font-size: calc(13 * var(--p));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* ---------- Ghost cursor, sweep and ripple (hints) ---------- */
+
+.dm-cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 300;
+  width: calc(22 * var(--p));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.dm-sweep {
+  position: absolute;
+  z-index: 250;
+  background: rgba(38, 180, 254, 0.22);
+  pointer-events: none;
+}
+
+.dm-ripple {
+  position: absolute;
+  z-index: 299;
+  width: calc(36 * var(--p));
+  height: calc(36 * var(--p));
+  margin: calc(-18 * var(--p)) 0 0 calc(-18 * var(--p));
+  border: 2px solid #26b4fe;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: dm-rip 0.7s ease-out both;
+}
+
+@keyframes dm-rip {
+  from {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* ADD button pulses when the demo is finished */
+.add-btn.dm-pulse {
+  animation: dm-add 1.6s ease-out infinite;
+}
+
+@keyframes dm-add {
+  0% {
+    box-shadow: 0 0 0 0 rgba(38, 180, 254, 0.6);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px rgba(38, 180, 254, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm *,
+  .dm-card,
+  .dm-note,
+  .add-btn.dm-pulse {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .dm {
+    display: none;
+  }
+}
+/* ---------- Finale: centered, narrower card, blue tagline ---------- */
+
+.dm.is-final .dm-c1 {
+  left: calc(499.5 * var(--p));
+  top: calc(124 * var(--p));
+  width: calc(675 * var(--p));
+}
+
+.dm-tagline {
+  left: 0;
+  right: 0;
+  top: calc(70 * var(--p));
+  text-align: center;
+  color: #26b4fe;
+  font-size: calc(24 * var(--p));
+  letter-spacing: 0.02em;
+}
+
+/* Heart icon in the card strip */
+.dm-num svg {
+  display: block;
+  width: calc(17 * var(--p));
+  height: auto;
+}
+
+/* Replay and "try it on your own PDF": to the right of the card, level with its strip */
+.dm-done {
+  left: calc(1206 * var(--p));
+  top: calc(124 * var(--p));
+  width: calc(300 * var(--p));
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(14 * var(--p));
+  padding: calc(14 * var(--p)) calc(16 * var(--p));
+}

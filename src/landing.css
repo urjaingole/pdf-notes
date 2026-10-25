@@ -1,0 +1,1007 @@
+/* While the landing page is showing, hide the app behind it */
+html:has(.lp) {
+  overflow: hidden;
+}
+
+html:has(.lp) .frame {
+  visibility: hidden;
+}
+
+/* ---------- 1920x1080 design pixels, scaled by --s ---------- */
+
+.lp {
+  --s: 1;
+  --p: calc(1px * var(--s)); /* one design pixel */
+  --note: #b2e0ff;
+  --stroke: #26b4fe;
+  --hl: #a1d2f3;
+  --hl-stroke: #26b4fe;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #f0f3f6;
+  color: rgba(0, 0, 0, 0.8);
+  font-family: 'Lekton', ui-monospace, Menlo, Consolas, monospace;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lp [hidden] {
+  display: none !important;
+}
+
+/* No transform on the stage: it would stop the blend modes from seeing the page */
+.lp-stage {
+  position: relative;
+  width: calc(1920 * var(--p));
+  height: calc(1080 * var(--p));
+}
+
+/* ---------- Text ---------- */
+
+.lp-top,
+.lp-left,
+.lp-cap,
+.lp-sub,
+.lp-title {
+  position: absolute;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.lp-top {
+  left: calc(40 * var(--p));
+  top: calc(48 * var(--p));
+  width: calc(560 * var(--p));
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+}
+
+.lp-title {
+  left: calc(555 * var(--p));
+  top: calc(40 * var(--p));
+  width: calc(1325 * var(--p));
+  color: #1b1b1c;
+  font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: calc(60 * var(--p));
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: calc(-1.8 * var(--p));
+}
+
+.lp-dot {
+  position: absolute;
+  left: calc(1269 * var(--p));
+  top: calc(173 * var(--p));
+  width: calc(16 * var(--p));
+  height: calc(16 * var(--p));
+  background: #f25050;
+}
+
+.lp-sub {
+  left: calc(1297 * var(--p));
+  top: calc(202 * var(--p));
+  font-size: calc(24 * var(--p));
+  line-height: 1.2;
+}
+
+/* Middle row: everything is centered on y = 540 */
+
+.lp-left {
+  left: calc(40 * var(--p));
+  top: calc(540 * var(--p));
+  width: calc(330 * var(--p));
+  transform: translateY(-50%);
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+}
+
+.lp-cap {
+  right: calc(841 * var(--p));
+  top: calc(540 * var(--p));
+  transform: translateY(-50%);
+  color: #010101;
+  font-size: calc(18 * var(--p));
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.lp-step {
+  position: absolute;
+  left: calc(1104 * var(--p));
+  top: calc(540 * var(--p));
+  transform: translateY(-50%);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc(10 * var(--p));
+  box-sizing: border-box;
+  min-width: calc(84 * var(--p));
+  padding: calc(10 * var(--p));
+  border-radius: calc(8 * var(--p));
+  border: 1px solid #b9b9b9;
+  background: #f6f9fa;
+  box-shadow: calc(4 * var(--p)) calc(4 * var(--p)) calc(50 * var(--p)) 0
+    rgba(154, 159, 161, 0.16);
+  color: #010101;
+  font-family: inherit;
+  font-size: calc(18 * var(--p));
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: default;
+  pointer-events: none;
+}
+
+.lp.is-final .lp-step {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Arrow from the pill to the card (only at step 1) */
+.lp-ptr {
+  position: absolute;
+  left: calc(1188 * var(--p));
+  top: calc(540 * var(--p));
+  width: calc(81 * var(--p));
+  height: calc(14 * var(--p));
+  transform: translateY(-50%);
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.lp:not(.step-1) .lp-ptr {
+  opacity: 0;
+}
+
+.lp-line {
+  position: absolute;
+  left: 0;
+  right: calc(8 * var(--p));
+  top: 50%;
+  height: 1px;
+  background: #111;
+  transform-origin: left center;
+  animation: lp-line 1.6s ease-in-out infinite;
+}
+
+.lp-tri {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: calc(12 * var(--p));
+  height: 100%;
+  background: #111;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  animation: lp-tri 1.6s ease-in-out infinite;
+}
+
+@keyframes lp-tri {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-8 * var(--p)));
+  }
+}
+
+@keyframes lp-line {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.9);
+  }
+}
+
+/* INSTALL */
+.lp-cta {
+  position: absolute;
+  right: calc(40 * var(--p));
+  top: calc(540 * var(--p));
+  transform: translateY(-50%);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #db0000;
+  font-family: 'Londrina Solid', 'Lekton', sans-serif;
+  font-size: calc(18 * var(--p));
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: calc(0.72 * var(--p));
+  text-transform: uppercase;
+  filter: blur(0.5px);
+  cursor: pointer;
+}
+
+.lp-cta.lp-pulse {
+  animation: lp-cta 1.4s ease-in-out infinite;
+}
+
+@keyframes lp-cta {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.lp-pop {
+  position: absolute;
+  right: calc(40 * var(--p));
+  top: calc(574 * var(--p));
+  z-index: 200;
+  width: calc(300 * var(--p));
+  box-sizing: border-box;
+  padding: calc(16 * var(--p));
+  border-radius: calc(8 * var(--p));
+  border: 1px solid #b9b9b9;
+  background: #f6f9fa;
+  box-shadow: calc(4 * var(--p)) calc(4 * var(--p)) calc(50 * var(--p)) 0
+    rgba(154, 159, 161, 0.16);
+  font-size: calc(14 * var(--p));
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.lp-pop p {
+  margin: 0;
+}
+
+.lp-open {
+  margin-top: calc(12 * var(--p));
+  padding: calc(8 * var(--p)) calc(12 * var(--p));
+  border: 0;
+  border-radius: 0;
+  background: #111;
+  color: #fff;
+  font-family: inherit;
+  font-size: calc(13 * var(--p));
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* ---------- Cards and notes ----------
+   Layers share one stacking context (the page), so the blend modes
+   can see what is behind them. Do not add opacity, transform or filter to them. */
+
+.lp-card,
+.lp-note {
+  position: absolute;
+  width: calc(443 * var(--p));
+  pointer-events: none;
+  animation: lp-rise 0.6s ease backwards;
+}
+
+.lp-c1 {
+  --z: 10;
+  --strip-bg: #f6f9fa;
+  --strip-border: #fff;
+  left: calc(1269 * var(--p));
+  top: calc(274 * var(--p));
+}
+
+.lp-c1.is-active {
+  --strip-bg: #ebfef7;
+  --strip-border: #30dfc5;
+}
+
+.lp-n2 {
+  --z: 20;
+  left: calc(304 * var(--p));
+  top: calc(633 * var(--p));
+}
+
+.lp-c3 {
+  --z: 30;
+  --strip-bg: #f6f9fa;
+  --strip-border: #fff;
+  left: calc(672 * var(--p));
+  top: calc(819 * var(--p));
+}
+
+.lp-c3.is-active {
+  --strip-bg: #ffeaeb;
+  --strip-border: #ff8e8e;
+}
+
+.lp-n4 {
+  --z: 40;
+  left: calc(950 * var(--p));
+  top: calc(633 * var(--p));
+}
+
+.lp.step-1 .lp-c1,
+.lp.step-2 .lp-n2,
+.lp.step-3 .lp-c3,
+.lp.step-4 .lp-n4,
+.lp.is-done .lp-n4 {
+  pointer-events: auto;
+}
+
+@keyframes lp-rise {
+  from {
+    margin-top: calc(16 * var(--p));
+  }
+}
+
+.lp-card.is-pop,
+.lp-note.is-pop {
+  animation: lp-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.lp-note.lp-shake {
+  animation: lp-shake 0.35s ease;
+}
+
+@keyframes lp-shake {
+  25% {
+    margin-left: calc(-7 * var(--p));
+  }
+  75% {
+    margin-left: calc(7 * var(--p));
+  }
+}
+
+/* Fades things out at the end, without opacity */
+.lp-veil {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 5);
+  background: #f0f3f6;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.is-fading > .lp-veil {
+  opacity: 1;
+}
+
+/* ---------- Card strip ---------- */
+
+.lp-strip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(24 * var(--p));
+  box-sizing: border-box;
+  height: calc(36 * var(--p));
+  padding: calc(10 * var(--p)) calc(16 * var(--p));
+  font-size: calc(16 * var(--p));
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* "color" blend: tints what is behind the strip, never the text */
+.lp-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 1);
+  background: var(--strip-bg);
+  mix-blend-mode: color;
+  transition: background 0.3s ease;
+  pointer-events: none;
+}
+
+.lp-strip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 3);
+  border: 1px solid var(--strip-border);
+  transition: border-color 0.3s ease;
+  pointer-events: none;
+}
+
+.lp-strip > * {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+}
+
+.lp-strip b {
+  font-size: calc(18 * var(--p));
+  font-weight: 700;
+}
+
+/* ---------- Card paper ---------- */
+
+.lp-paper {
+  position: relative;
+  z-index: calc(var(--z) + 1);
+  box-sizing: border-box;
+  height: calc(713 * var(--p));
+  padding: calc(40 * var(--p));
+  overflow: hidden;
+  border: 1px solid rgba(187, 191, 194, 0.13);
+  background: #f6f9fa;
+  box-shadow: 0 calc(8 * var(--p)) calc(50 * var(--p)) 0 rgba(154, 159, 161, 0.16);
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+}
+
+.lp-c3 .lp-paper {
+  height: calc(174 * var(--p));
+}
+
+/* Only whole lines are shown, so no line is ever cut in half */
+.lp-tbox {
+  overflow: hidden;
+  height: calc(29 * 21.6 * var(--p));
+  height: calc(29 * 1lh);
+}
+
+.lp-c3 .lp-tbox {
+  height: calc(5 * 21.6 * var(--p));
+  height: calc(5 * 1lh);
+}
+
+.lp-text {
+  position: relative;
+  margin: 0;
+}
+
+.lp-c1 .lp-text {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+.lp-c1 ::selection {
+  background: rgba(38, 180, 254, 0.25);
+}
+
+/* The soft rectangle that merges the bottom of each card */
+.lp-paper::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(180 * var(--p));
+  background: linear-gradient(181deg, rgba(246, 249, 250, 0) 11.67%, #f6f9fa 98.82%);
+  filter: blur(calc(5 * var(--p)));
+  pointer-events: none;
+}
+
+.lp-c3 .lp-paper::after {
+  height: calc(70 * var(--p));
+}
+
+.lp-hls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Color legend, shown in the finale */
+.lp-legend {
+  display: none;
+  position: absolute;
+  z-index: 2;
+  left: calc(40 * var(--p));
+  bottom: calc(24 * var(--p));
+  gap: calc(14 * var(--p));
+  font-size: calc(13 * var(--p));
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lp.is-final .lp-legend {
+  display: flex;
+}
+
+.lp-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6 * var(--p));
+}
+
+.lp-legend i {
+  display: block;
+  width: calc(14 * var(--p));
+  height: calc(14 * var(--p));
+}
+
+/* Highlight: 1px stroke, fill with the "color" blend on its own layer */
+.lp-hl {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid var(--hl-stroke);
+  animation: lp-grow 0.4s ease-out backwards;
+  transition: border-color 0.3s ease;
+}
+
+.lp-hl::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--hl);
+  mix-blend-mode: color;
+  transition: background 0.3s ease;
+}
+
+@keyframes lp-grow {
+  from {
+    width: 0;
+  }
+}
+
+.lp.step-3 .lp-c3 .lp-hl {
+  pointer-events: auto;
+  cursor: pointer;
+  animation:
+    lp-grow 0.4s ease-out backwards,
+    lp-ring 1.4s ease-out 0.4s infinite;
+}
+
+.lp-hl.lp-ping {
+  animation: lp-ring 0.9s ease-out 2;
+}
+
+@keyframes lp-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(38, 180, 254, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 calc(10 * var(--p)) rgba(38, 180, 254, 0);
+  }
+}
+
+/* ---------- Frosted notes ---------- */
+
+.lp-note {
+  --strip-h: calc(36 * var(--p));
+  display: flex;
+  flex-direction: column;
+  height: calc(348 * var(--p));
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+}
+
+/* glass: blurs what is behind the note */
+.lp-note::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--z);
+  -webkit-backdrop-filter: blur(calc(4 * var(--p)));
+  backdrop-filter: blur(calc(4 * var(--p)));
+  pointer-events: none;
+}
+
+/* body tint */
+.lp-note::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: var(--strip-h);
+  z-index: calc(var(--z) + 1);
+  background: var(--note);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.lp-nstrip {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--p));
+  box-sizing: border-box;
+  height: var(--strip-h);
+  padding: 0 calc(16 * var(--p));
+}
+
+.lp-nstrip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 1);
+  background: var(--stroke);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+
+.lp-nstrip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z) + 3);
+  border: 1px solid var(--stroke);
+  pointer-events: none;
+}
+
+.lp-nstrip > * {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+}
+
+.lp-sq {
+  width: calc(20 * var(--p));
+  height: calc(20 * var(--p));
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--c);
+  cursor: pointer;
+}
+
+.lp-sq.is-current {
+  box-shadow: inset 0 0 0 1px var(--sc);
+}
+
+.lp-sq.none {
+  background: #fff
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 0.7px),
+      #111 calc(50% - 0.7px),
+      #111 calc(50% + 0.7px),
+      transparent calc(50% + 0.7px)
+    );
+  box-shadow: inset 0 0 0 1px #111;
+}
+
+.lp-nbody {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+  flex: 1;
+  padding: calc(40 * var(--p)) calc(40 * var(--p)) 0;
+}
+
+.lp-ta {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(170 * var(--p));
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: calc(18 * var(--p));
+  line-height: 1.2;
+  overflow: hidden;
+  resize: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.lp-ta::placeholder {
+  color: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.lp-ta:disabled {
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+.lp-ta.lp-nudge {
+  outline: 1px dashed var(--stroke);
+  outline-offset: calc(8 * var(--p));
+}
+
+.lp-ntext {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.lp-nfoot {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(24 * var(--p)) calc(40 * var(--p)) calc(40 * var(--p));
+}
+
+.lp-actions {
+  display: flex;
+  gap: calc(8 * var(--p));
+}
+
+.lp-save,
+.lp-cancel {
+  height: calc(30 * var(--p));
+  padding: 0 calc(16 * var(--p));
+  border-radius: 0;
+  font-family: inherit;
+  font-size: calc(14 * var(--p));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.lp-save {
+  border: 0;
+  background: #111;
+  color: #fff;
+}
+
+.lp-cancel {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  background: transparent;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.lp-bin {
+  display: grid;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.lp-edit {
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--p));
+  font-size: calc(16 * var(--p));
+}
+
+/* The numbered tab above each note */
+.lp-tab {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  z-index: calc(var(--z) + 3);
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--p));
+  box-sizing: border-box;
+  height: calc(28 * var(--p));
+  padding: 0 calc(12 * var(--p));
+  background: #fff;
+  border: 1px solid var(--stroke);
+  border-bottom: 0;
+  font-size: calc(14 * var(--p));
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lp-tab b {
+  font-weight: 700;
+}
+
+/* ---------- Ghost cursor, sweep and ripple (hints) ---------- */
+
+.lp-cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 300;
+  width: calc(22 * var(--p));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.lp-sweep {
+  position: absolute;
+  z-index: 250;
+  background: rgba(38, 180, 254, 0.22);
+  pointer-events: none;
+}
+
+.lp-ripple {
+  position: absolute;
+  z-index: 299;
+  width: calc(36 * var(--p));
+  height: calc(36 * var(--p));
+  margin: calc(-18 * var(--p)) 0 0 calc(-18 * var(--p));
+  border: 2px solid #26b4fe;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: lp-rip 0.7s ease-out both;
+}
+
+@keyframes lp-rip {
+  from {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp *,
+  .lp-card,
+  .lp-note {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Round 2: anchored to the real window edges ---------- */
+
+.lp {
+  display: block;
+}
+
+.lp-stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: auto;
+  top: max(0px, calc((100% - 1080 * var(--p)) / 2));
+  height: calc(1080 * var(--p));
+}
+
+/* Left side: 40px from the left edge */
+.lp-top {
+  left: calc(40 * var(--p));
+  top: calc(48 * var(--p));
+  width: calc(480 * var(--p));
+  font-size: max(11px, calc(18 * var(--p)));
+}
+
+.lp-left {
+  left: calc(40 * var(--p));
+  font-size: max(11px, calc(18 * var(--p)));
+}
+
+/* Right side: pinned to the right edge */
+.lp-title {
+  left: auto;
+  right: calc(40 * var(--p));
+  text-align: right; /* change to "left" to match the Figma frame */
+}
+
+.lp-dot {
+  left: auto;
+  right: calc(635 * var(--p));
+}
+
+.lp-sub {
+  left: auto;
+  right: calc(40 * var(--p));
+  width: calc(583 * var(--p));
+  font-size: max(12px, calc(24 * var(--p)));
+}
+
+.lp-cap {
+  right: calc(839 * var(--p));
+  font-size: max(11px, calc(18 * var(--p)));
+}
+
+.lp-step {
+  left: auto;
+  right: calc(732 * var(--p));
+  font-size: max(11px, calc(18 * var(--p)));
+}
+
+.lp-ptr {
+  left: auto;
+  right: calc(651 * var(--p));
+}
+
+.lp-cta {
+  font-size: max(11px, calc(18 * var(--p)));
+}
+
+.lp-c1 {
+  left: auto;
+  right: calc(208 * var(--p));
+}
+
+.lp-n2 {
+  left: auto;
+  right: calc(1173 * var(--p));
+}
+
+.lp-c3 {
+  left: auto;
+  right: calc(805 * var(--p));
+}
+
+.lp-n4 {
+  left: auto;
+  right: calc(527 * var(--p));
+}
+
+/* Card strips: soft white, as in the spec (no green) */
+.lp-card,
+.lp-card.is-active {
+  --strip-bg: #f6f9fa;
+  --strip-border: #fff;
+}
+
+.lp-strip::before {
+  mix-blend-mode: normal;
+  -webkit-backdrop-filter: blur(calc(2.5 * var(--p)));
+  backdrop-filter: blur(calc(2.5 * var(--p)));
+}
+/* ---------- Round 3: same margins and sizes as the homepage ---------- */
+
+.lp {
+  --hu: calc(1px * var(--u, 1)); /* the homepage's unit */
+  --hdr: calc(232 * var(--hu)); /* height of the header area */
+  --c: max(0px, calc((100vh - var(--hdr) - 848 * var(--p)) / 2)); /* spare room in tall windows */
+  --so: calc(var(--hdr) - 232 * var(--p) + var(--c)); /* how far the demo area is pushed down */
+}
+
+.lp-stage {
+  top: var(--so);
+}
+
+/* Header: 40px from the real window edges, sized like the homepage */
+.lp-top {
+  left: calc(40 * var(--hu));
+  top: calc(48 * var(--hu) - var(--so));
+  width: calc(480 * var(--hu));
+  font-size: max(11px, calc(18 * var(--hu)));
+}
+
+.lp-title {
+  right: calc(40 * var(--hu));
+  top: calc(40 * var(--hu) - var(--so));
+  width: calc(1325 * var(--hu));
+  font-size: calc(60 * var(--hu));
+  letter-spacing: calc(-1.8 * var(--hu));
+}
+
+.lp-dot {
+  right: calc(635 * var(--hu));
+  top: calc(173 * var(--hu) - var(--so));
+  width: calc(16 * var(--hu));
+  height: calc(16 * var(--hu));
+}
+
+.lp-sub {
+  right: calc(40 * var(--hu));
+  top: calc(202 * var(--hu) - var(--so));
+  width: calc(583 * var(--hu));
+  font-size: max(12px, calc(24 * var(--hu)));
+}
+
+.lp-left {
+  left: calc(40 * var(--hu));
+}
+
+.lp-cta,
+.lp-pop {
+  right: calc(40 * var(--hu));
+}
+
+/* Step 2: Save pulses once the note has typed itself */
+.lp-save.lp-cue {
+  outline: 2px solid #111;
+  outline-offset: calc(3 * var(--p));
+  animation: lp-cue 1.1s ease-in-out infinite;
+}
+
+@keyframes lp-cue {
+  0%,
+  100% {
+    outline-offset: calc(3 * var(--p));
+  }
+  50% {
+    outline-offset: calc(7 * var(--p));
+  }
+}

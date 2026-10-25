@@ -1,3 +1,772 @@
+:root {
+  /* These are set by layout() in main.js; the values here are fallbacks */
+  --u: 1;
+  --cell: 18px;
+  --frame-w: min(1674px, calc(100% - 192px));
+  --frame-x: 96px;
+  --title-fs: 108px;
+  --below-baseline: 0.2;
+  --grid-img: none;
+  --hatch-img: none;
+
+  --topbar: calc(5 * var(--cell));
+  --bg: #eef1f4;
+  --frame: #a2eae1; /* the 1px frame lines and rules */
+  --ink: #111;
+  --red: #ff2e2e;
+  --plus: calc(20px * var(--u));
+  --plus-w: 4px;
+  --plus-color: #30dfc5;
+  --note-h: calc(32px * var(--u));
+  --note-w: 380px; /* width of sticky notes in the reader */
+
+  /* Library heights adapt to the window height so the next row always peeks out.
+     At a 1080px-tall window they match the design: 238px band, 462px cards. */
+  --avail: calc(100vh - 364px * var(--u));
+  --band: clamp(
+    calc(90px * var(--u)),
+    calc(var(--avail) - 462px * var(--u)),
+    calc(238px * var(--u))
+  );
+  --card-h: clamp(
+    calc(300px * var(--u)),
+    calc(var(--avail) - var(--band)),
+    calc(462px * var(--u))
+  );
+}
+
+html {
+  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: scroll; /* always show the scrollbar so the layout never jumps */
+}
+
+body {
+  margin: 0;
+  font-family: 'Lekton', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  color: var(--ink);
+  background-color: var(--bg);
+  background-image: var(--hatch-img);
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Frame (square grid) ---------- */
+
+.frame {
+  position: relative;
+  width: var(--frame-w);
+  min-height: 100vh;
+  margin-left: var(--frame-x);
+  margin-right: auto;
+  background-color: var(--bg);
+  background-image: var(--grid-img);
+  box-shadow: -1px 0 0 var(--frame), 1px 0 0 var(--frame);
+}
+
+/* ---------- Library ---------- */
+
+/* Title starts 90px (5 cells) from the top */
+#library {
+  padding-top: calc(5 * var(--cell));
+}
+
+/* The head spans exactly 4 cells between two grid lines.
+   The title's capital letters are sized to be exactly that tall. */
+.lib-head {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: calc(4 * var(--cell));
+}
+
+/* Small product label above the title */
+.lib-eyebrow {
+  position: absolute;
+  left: calc(32px * var(--u));
+  bottom: calc(100% + 0.5 * var(--cell));
+  margin: 0;
+  font-family: 'IBM Plex Sans Condensed', system-ui, sans-serif;
+  font-size: max(11px, calc(18px * var(--u)));
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Full-width 1px rules: above the title, on the title baseline, under the band */
+.lib-head::before,
+.lib-head::after,
+.band::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 100vw;
+  height: 1px;
+  background: var(--frame);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.lib-head::before {
+  top: 0;
+}
+
+.lib-head::after {
+  bottom: -1px;
+  z-index: 2;
+}
+
+.band::after {
+  bottom: 0;
+}
+
+.lib-title {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(12px * var(--u));
+  margin: 0;
+  font-family: 'IBM Plex Sans Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: var(--title-fs);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.title-block {
+  flex: none;
+  width: calc(20px * var(--u));
+  height: calc(20px * var(--u));
+  background: var(--ink);
+}
+
+.title-text {
+  display: block;
+  line-height: 1;
+  text-box: trim-both cap alphabetic;
+}
+
+/* Browsers without text-box-trim: line the baseline up using measured font metrics */
+@supports not (text-box: trim-both cap alphabetic) {
+  .title-text {
+    margin-bottom: calc(var(--title-fs) * var(--below-baseline) * -1);
+  }
+}
+
+/* ADD: a red block in the right margin, as tall as the title row */
+.add-btn {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: calc(100% + 1px);
+  display: grid;
+  place-items: center;
+  width: min(var(--frame-x, 96px), calc(123px * var(--u)));
+  height: 100%;
+  background: var(--red);
+  color: var(--ink);
+  font-size: max(12px, calc(20px * var(--u)));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  filter: brightness(0.94);
+}
+
+.band {
+  position: relative;
+  height: var(--band);
+  /* Solid background so the grid doesn't show through the hatch */
+  background-color: var(--bg);
+  background-image: var(--hatch-img);
+}
+
+/* Full-width line along the bottom of the note */
+.band::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--note-h) - 1px);
+  left: 50%;
+  width: 100vw;
+  height: 1px;
+  background: var(--frame);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Count + storage note: top right corner of the band */
+.band-info {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0 18px;
+  max-width: 100%;
+  height: var(--note-h);
+  padding: 0 18px;
+  overflow: hidden;
+  white-space: nowrap;
+  background: #fff;
+  border-left: 1px solid var(--frame);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.lib-count {
+  font-weight: 700;
+}
+
+.lib-note {
+  color: #4b5961;
+}
+
+.lib-msg {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  max-width: calc(100% - 24px);
+  padding: 9px 14px;
+  background: var(--red);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.lib-list {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), 1fr);
+  column-gap: calc(16px * var(--u));
+  row-gap: calc(72px * var(--u));
+  padding-bottom: calc(96px * var(--u));
+}
+
+/* Plus connectors where the band meets the frame lines */
+.lib-list::before,
+.lib-list::after,
+.topbar-frame::before,
+.topbar-frame::after {
+  content: '';
+  position: absolute;
+  width: var(--plus);
+  height: var(--plus);
+  background: linear-gradient(var(--plus-color), var(--plus-color)) center / var(--plus-w) 100%
+      no-repeat,
+    linear-gradient(var(--plus-color), var(--plus-color)) center / 100% var(--plus-w) no-repeat;
+  pointer-events: none;
+}
+
+.lib-list::before,
+.lib-list::after {
+  top: calc(var(--plus) / -2 - 0.5px);
+}
+
+.lib-list::before {
+  left: calc(var(--plus) / -2 - 0.5px);
+}
+
+.lib-list::after {
+  right: calc(var(--plus) / -2 - 0.5px);
+}
+
+.paper-card {
+  position: relative;
+  height: var(--card-h);
+  background: radial-gradient(
+      circle at 50% 58%,
+      rgba(20, 40, 50, 0.06),
+      transparent 62%
+    ),
+    rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.paper-card:hover {
+  background-color: rgba(255, 255, 255, 0.92);
+  outline: 1px solid var(--frame);
+}
+
+.paper-open {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: calc(16px * var(--u));
+  padding: calc(40px * var(--u));
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.paper-open:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -4px;
+}
+
+.paper-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: calc(26px * var(--u));
+  font-weight: 400;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.paper-meta {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--u));
+  font-size: max(11px, calc(18px * var(--u)));
+  font-weight: 400;
+  line-height: 1;
+}
+
+.paper-meta b {
+  font-weight: 700;
+}
+
+/* "Last opened" matters less */
+.paper-meta span:last-child {
+  opacity: 0.6;
+}
+
+/* Small on purpose, so papers aren't deleted by accident */
+.paper-card .card-del {
+  position: absolute;
+  right: calc(36px * var(--u));
+  bottom: calc(36px * var(--u));
+  z-index: 2;
+  width: auto;
+  height: auto;
+  padding: 4px;
+}
+
+.card-del svg {
+  display: block;
+  width: max(10px, calc(13px * var(--u)));
+  height: auto;
+}
+
+/* Empty home page box, with plus connectors and a line along its bottom */
+.lib-empty {
+  position: relative;
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: calc(3 * var(--cell)) 24px;
+  background: rgba(255, 255, 255, 0.72);
+  text-align: center;
+  color: #4b5961;
+}
+
+.lib-empty::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: -1px;
+  width: 100vw;
+  height: 1px;
+  background: var(--frame);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.lib-empty::before {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  left: calc(var(--plus) / -2 - 0.5px);
+  right: calc(var(--plus) / -2 - 0.5px);
+  bottom: calc(var(--plus) / -2 - 0.5px);
+  height: var(--plus);
+  background:
+    linear-gradient(var(--plus-color), var(--plus-color))
+      left calc(var(--plus) / 2 - var(--plus-w) / 2) center / var(--plus-w) 100% no-repeat,
+    linear-gradient(var(--plus-color), var(--plus-color))
+      left center / var(--plus) var(--plus-w) no-repeat,
+    linear-gradient(var(--plus-color), var(--plus-color))
+      right calc(var(--plus) / 2 - var(--plus-w) / 2) center / var(--plus-w) 100% no-repeat,
+    linear-gradient(var(--plus-color), var(--plus-color))
+      right center / var(--plus) var(--plus-w) no-repeat;
+  pointer-events: none;
+}
+
+/* ---------- Reader: top bar ---------- */
+
+.topbar {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar);
+  background-color: var(--bg);
+  background-image: var(--hatch-img);
+}
+
+.topbar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--frame);
+}
+
+.topbar-frame {
+  position: relative;
+  width: var(--frame-w);
+  height: 100%;
+  margin-left: var(--frame-x);
+  background-color: var(--bg);
+  background-image: var(--grid-img);
+  box-shadow: -1px 0 0 var(--frame), 1px 0 0 var(--frame);
+}
+
+.topbar-frame::before,
+.topbar-frame::after {
+  bottom: calc(var(--plus) / -2 + 0.5px);
+  z-index: 2;
+}
+
+.topbar-frame::before {
+  left: calc(var(--plus) / -2 - 0.5px);
+}
+
+.topbar-frame::after {
+  right: calc(var(--plus) / -2 - 0.5px);
+}
+
+.back-btn {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: calc(6 * var(--cell));
+  height: calc(2 * var(--cell));
+  border: 1px solid var(--frame);
+  background: #b6f0e8;
+  color: var(--ink);
+  font-size: max(11px, calc(14px * var(--u)));
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background: #a3e9df;
+}
+
+.show-wrap {
+  position: absolute;
+  top: 100%;
+  right: 0;
+}
+
+.show-btn {
+  min-width: calc(6 * var(--cell));
+  height: calc(2 * var(--cell));
+  padding: 0 12px;
+  border: 1px solid var(--frame);
+  background: #fff;
+  color: var(--ink);
+  font-size: max(11px, calc(14px * var(--u)));
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.show-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: calc(12 * var(--cell));
+  background: #fff;
+  border: 1px solid var(--frame);
+  border-top: 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: calc(2 * var(--cell));
+  padding: 0 9px 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--frame);
+  background: #fff;
+  color: var(--ink);
+  font-size: max(11px, calc(14px * var(--u)));
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.menu-item:last-child {
+  border-bottom: 0;
+}
+
+.menu-item:hover {
+  background: #f1fbf9;
+}
+
+.menu-item.off {
+  opacity: 0.5;
+}
+
+.menu-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-sq {
+  flex: none;
+  width: var(--cell);
+  height: var(--cell);
+  background: var(--c);
+  box-shadow: inset 0 0 0 1px var(--stroke);
+}
+
+.menu-sq.off {
+  background-image: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.7px),
+    var(--ink) calc(50% - 0.7px),
+    var(--ink) calc(50% + 0.7px),
+    transparent calc(50% + 0.7px)
+  );
+}
+
+/* ---------- Reader: color strip on the right ---------- */
+
+.dock {
+  position: fixed;
+  z-index: 30;
+  top: 50%;
+  right: var(--frame-x);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+}
+
+.swatches {
+  display: flex;
+  flex-direction: column;
+}
+
+.swatch {
+  width: calc(2 * var(--cell));
+  height: calc(2 * var(--cell));
+  padding: 0;
+  border: 0;
+  background-color: var(--c);
+  cursor: pointer;
+}
+
+.swatch.active {
+  box-shadow: inset 0 0 0 2px var(--stroke);
+}
+
+.swatch.off {
+  opacity: 0.4;
+}
+
+.swatch.none {
+  background-color: #fff;
+  background-image: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.7px),
+    var(--ink) calc(50% - 0.7px),
+    var(--ink) calc(50% + 0.7px),
+    transparent calc(50% + 0.7px)
+  );
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.swatch.none.active {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.swatch-plus {
+  width: calc(2 * var(--cell));
+  height: calc(2 * var(--cell));
+  padding: 0;
+  border: 1px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.swatch-plus:hover {
+  background: #f1fbf9;
+}
+
+.colors-panel {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
+  width: 300px;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 16px;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--frame);
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.panel-hint {
+  margin: 6px 0 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #5a666d;
+}
+
+.panel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.panel-row input[type='text'],
+.panel-add input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid #c9d2d6;
+  border-radius: 0;
+  font-size: 13px;
+}
+
+.panel-x {
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.panel-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #dde3e6;
+}
+
+.panel-add input[type='color'] {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #c9d2d6;
+  border-radius: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.panel-add .text-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Color squares (recolor a highlight, and in the colors panel) */
+
+.sq-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sq {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--c);
+  cursor: pointer;
+}
+
+.sq.big {
+  width: 22px;
+  height: 22px;
+}
+
+.sq.current {
+  box-shadow: inset 0 0 0 2px var(--stroke);
+}
+
+.sq.none {
+  background-color: #fff;
+  background-image: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.7px),
+    #111 calc(50% - 0.7px),
+    #111 calc(50% + 0.7px),
+    transparent calc(50% + 0.7px)
+  );
+  box-shadow: inset 0 0 0 1px #111;
+}
+
+/* ---------- Reader pages ---------- */
+
+#pages {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: calc(var(--topbar) + 3 * var(--cell)) 0 96px;
+}
+
+.page {
+  position: relative;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(20, 40, 50, 0.14);
+}
+
 .highlightLayer {
   position: absolute;
   inset: 0;
@@ -6,70 +775,487 @@
 
 .highlight {
   position: absolute;
-  background: rgba(255, 213, 0, 0.4);
   mix-blend-mode: multiply;
   cursor: pointer;
   pointer-events: auto;
 }
 
-.highlight.has-note {
-  border-bottom: 2px solid #e0a800;
-}
+/* ---------- Popovers: the small prompt and menu ---------- */
 
-.note-popup {
+.popover {
   position: absolute;
   z-index: 10;
-  width: 280px;
-  padding: 12px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
-}
-
-.note-popup.hidden {
-  display: none;
-}
-
-.note-popup textarea {
-  width: 100%;
-  min-height: 80px;
   box-sizing: border-box;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font: inherit;
-  font-size: 14px;
-  resize: vertical;
 }
 
-.note-actions {
+.popover.toolbar {
   display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  background: #111;
+  color: #fff;
+}
+
+.popover.toolbar .sq-row {
+  padding: 0 8px;
+}
+
+.popover.toolbar .sq.current {
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.chip {
+  padding: 7px 10px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.chip.icon {
+  padding: 7px 9px;
+  color: #b9c2c7;
+}
+
+.chip.danger {
+  color: #ff8a8a;
+}
+
+/* ---------- Sticky notes: frosted glass with real blend modes ----------
+
+   Each note is built from layers that all live in the SAME stacking context as
+   the page behind it (so the blend modes can see what is underneath):
+     glass  (::before)         blurs what is behind the note
+     tint   (::after)          the body color, multiplied over the blurred backdrop
+     strip tint (.note-strip::before)  the color strip, using the "color" blend mode
+     content (z-index + 2)     text and buttons, never blended
+   Do not add opacity, transform, filter or z-index to .popover.sticky itself:
+   that would isolate it and the blending would stop working. */
+
+.popover.sticky {
+  --z: 10;
+  --strip-h: 36px;
+  --note-bg: #b2e0ff;
+  --note-border: #26b4fe;
+  --note-fg: rgba(0, 0, 0, 0.8);
+  width: var(--note-w);
+  z-index: auto;
+  overflow: visible;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--note-fg);
+  font-family: 'Lekton', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+/* Glass: blurs everything behind the note */
+.popover.sticky::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--z);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Body tint (multiply is the closest CSS match to Figma's "plus darker") */
+.popover.sticky::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: var(--strip-h);
+  z-index: calc(var(--z) + 1);
+  background: var(--note-bg);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* The color strip at the top of the note */
+.note-strip {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: var(--strip-h);
+  padding: 0 16px;
+}
+
+.note-strip::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--strip-h);
+  z-index: calc(var(--z) + 1);
+  background: var(--note-border);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+
+/* 1px stroke around the strip, drawn on top and never blended */
+.note-strip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--strip-h);
+  z-index: calc(var(--z) + 3);
+  box-sizing: border-box;
+  border: 1px solid var(--note-border);
+  pointer-events: none;
+}
+
+.note-strip .sq-row {
+  position: relative;
+  z-index: calc(var(--z) + 2);
   gap: 8px;
-  margin-top: 8px;
 }
 
-.note-actions .spacer {
-  flex: 1;
+.popover.sticky .sq {
+  width: 20px;
+  height: 20px;
 }
 
-.note-actions button {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
+.popover.sticky .sq.current {
+  box-shadow: inset 0 0 0 1px var(--stroke);
+}
+
+.note-body {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+  padding: 32px 32px 0;
+}
+
+.sticky-body {
+  max-height: 50vh;
+  overflow: auto;
+  font-size: 18px;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.sticky-body a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.popover.sticky textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 60px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
   font: inherit;
+  font-size: 18px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  resize: none;
+}
+
+.popover.sticky textarea::placeholder {
+  color: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.sticky-foot {
+  position: relative;
+  z-index: calc(var(--z) + 2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 32px;
+}
+
+.foot-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-btn {
+  padding: 9px 16px;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-family: 'Lekton', ui-monospace, monospace;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--note-fg, #111);
+  background: transparent;
+  color: var(--note-fg, #111);
+  font-family: 'Lekton', ui-monospace, monospace;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.del-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sticky-foot .del-btn {
+  width: auto;
+  height: auto;
+  padding: 4px 4px 4px 0;
+}
+
+.sticky-foot .foot-actions + .del-btn {
+  padding: 4px 0 4px 4px;
+}
+
+.edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0 4px 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: 'Lekton', ui-monospace, monospace;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  text-decoration: underline;
+}
+
+.text-btn {
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
   font-size: 13px;
   cursor: pointer;
 }
 
-.note-actions .btn-save {
-  background: #222;
-  border-color: #222;
+.text-btn.primary {
+  background: #111;
+  border-color: #111;
   color: #fff;
 }
 
-.note-actions .btn-delete {
-  color: #b00020;
-  border-color: transparent;
+/* ---------- Home page demo (built in 1920px design pixels, scaled with zoom) ----------
+   zoom is used instead of transform because a transform would isolate the layers
+   and stop the blend modes from seeing what is behind them. */
+
+.demo {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 900px;
+  zoom: var(--u);
+  pointer-events: none;
+  user-select: none;
+}
+
+.demo-card {
+  position: absolute;
+  left: calc(var(--x) * 1px);
+  top: calc(var(--y) * 1px);
+  width: 443px;
+}
+
+/* Card header strip: tinted with the "color" blend mode */
+.demo-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 16px;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 16px;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.demo-strip::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 36px;
+  z-index: 1;
+  background: var(--strip-bg);
+  mix-blend-mode: color;
+}
+
+.demo-strip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 36px;
+  z-index: 3;
+  box-sizing: border-box;
+  border: 1px solid var(--strip-border);
+}
+
+.demo-strip > * {
+  position: relative;
+  z-index: 2;
+}
+
+.demo-strip b {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.demo-copy {
+  position: relative;
+  height: 480px;
+  box-sizing: border-box;
+  padding: 40px;
+  overflow: hidden;
+  background: #f6f9fa;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.demo-copy p {
+  margin: 0;
+}
+
+/* The soft "merge" rectangle at the bottom of each card */
+.demo-copy::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 261px;
+  background: linear-gradient(181deg, rgba(246, 249, 250, 0) 11.67%, #f6f9fa 98.82%);
+  filter: blur(5px);
+}
+
+.demo-hl {
+  padding: 0 6px;
+  border: 1px solid #26b4fe;
+  background: #a1d2f3;
+}
+
+.popover.sticky.demo-note {
+  left: calc(var(--x) * 1px);
+  top: calc(var(--y) * 1px);
+  width: 443px;
+}
+
+/* The second note sits above the first if they ever overlap */
+.demo-note ~ .demo-note {
+  --z: 20;
+}
+
+.popover.sticky.demo-note .note-body {
+  padding: 40px 40px 0;
+}
+
+.popover.sticky.demo-note .sticky-foot {
+  padding: 32px 40px 40px;
+}
+
+.demo-type {
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* ---------- Narrower windows ---------- */
+
+@media (max-width: 1100px) {
+  .lib-list {
+    --cols: 3;
+  }
+
+  /* Stack the demo in one column */
+  .demo {
+    zoom: 1;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 48px;
+    padding: 48px 0 80px;
+  }
+
+  .demo-card,
+  .popover.sticky.demo-note {
+    position: relative;
+    left: auto;
+    top: auto;
+  }
+
+  .demo-card {
+    width: min(443px, 100%);
+  }
+
+  .popover.sticky.demo-note {
+    width: min(443px, calc(100% - 24px));
+    margin: -72px 0 0 24px;
+  }
+}
+
+@media (max-width: 800px) {
+  .lib-list {
+    --cols: 2;
+  }
+}
+
+@media (max-width: 520px) {
+  .lib-list {
+    --cols: 1;
+  }
+}
+
+/* Keep this last: it must win over every display rule above */
+.hidden {
+  display: none !important;
 }
